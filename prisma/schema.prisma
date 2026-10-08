@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String @id @default(cuid())
+  email             String @unique
+  passwordHash      String
+  name              String
+  calendarStartHour Int?
+  calendarEndHour   Int?
+}
+
+model Student {
+  id                  String            @id @default(cuid())
+  name                String
+  contact             String?
+  hourlyRateKopecks   Int
+  notes               String?
+  guardianContact     String?
+  schedulePreferences String?
+  active              Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  visits              Visit[]
+  series              RecurringSeries[]
+}
+
+model RecurringSeries {
+  id              String    @id @default(cuid())
+  studentId       String
+  student         Student   @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  weekday         Int
+  startTime       String
+  durationMinutes Int
+  startDate       DateTime  @db.Date
+  endDate         DateTime? @db.Date
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  visits          Visit[]
+}
+
+model Visit {
+  id               String           @id @default(cuid())
+  studentId        String
+  student          Student          @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  seriesId         String?
+  series           RecurringSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  occurrenceDate   DateTime?        @db.Date
+  scheduledAt      DateTime
+  durationMinutes  Int
+  status           VisitStatus      @default(scheduled)
+  notes            String?
+  rateKopecks      Int
+  amountDueKopecks Int
+  paid             Boolean          @default(false)
+  paidAt           DateTime?
+  createdAt        DateTime         @default(now())
+
+  @@unique([seriesId, occurrenceDate])
+  @@index([scheduledAt])
+  @@index([studentId])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+enum VisitStatus {
+  scheduled
+  completed
+  cancelled
+  no_show
+}
