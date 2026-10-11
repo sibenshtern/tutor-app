@@ -5,7 +5,9 @@ export const studentInput = z.object({
   name: z.string().trim().min(1, "Укажите имя").max(200),
   contact: optionalText,
   notes: optionalText,
+  guardianName: optionalText,
   guardianContact: optionalText,
+  school: optionalText,
   schedulePreferences: optionalText,
   hourlyRateKopecks: z
     .number({ invalid_type_error: "Укажите ставку, например 1500 или 1500,50" })

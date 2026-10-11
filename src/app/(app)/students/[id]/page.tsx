@@ -9,9 +9,20 @@ import { VisitList } from "@/components/visit-list";
 import { emptyStats, formatAttendance, studentBreakdown } from "@/domain/analytics";
 import { requirePageSession } from "@/lib/auth-guard";
 import { formatRub } from "@/lib/money";
+import { phoneHref } from "@/lib/phone";
 import { isoFromDateOnly, localDateString } from "@/lib/time";
 import { getStudent } from "@/server/students";
 import { listVisits } from "@/server/visits";
+
+function ContactLine({ label, value }: { label: string; value: string | null }) {
+  const href = phoneHref(value);
+  if (!href) return null;
+  return (
+    <p className="text-sm">
+      {label}: <a href={href} className="font-medium underline">{value}</a>
+    </p>
+  );
+}
 
 export default async function StudentPage({ params }: { params: Promise<{ id: string }> }) {
   await requirePageSession();
@@ -35,6 +46,8 @@ export default async function StudentPage({ params }: { params: Promise<{ id: st
           {!student.active && <DeleteStudentButton id={id} name={student.name} />}
         </div>
       </div>
+      <ContactLine label="Ученик" value={student.contact} />
+      <ContactLine label="Родитель" value={student.guardianContact} />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Проведено" value={String(stats.completedVisits)} />
         <Stat label="Часов" value={stats.hoursTaught.toLocaleString("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} />

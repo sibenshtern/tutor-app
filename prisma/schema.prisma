@@ -23,7 +23,9 @@ model Student {
   contact             String?
   hourlyRateKopecks   Int
   notes               String?
+  guardianName        String?
   guardianContact     String?
+  school              String?
   schedulePreferences String?
   active              Boolean           @default(true)
   createdAt           DateTime          @default(now())

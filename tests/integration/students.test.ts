@@ -19,6 +19,11 @@ describe("POST /api/students", () => {
     expect(res.status).toBe(201);
     expect(await res.json()).toMatchObject({ name: "Anna", hourlyRateKopecks: 150050, contact: null, active: true });
   });
+  it("stores parent name and school", async () => {
+    const res = await POST(jsonRequest("POST", { name: "Anna", hourlyRateKopecks: 1, guardianName: " Ольга ", school: "Лицей 5, 9Б" }), {});
+    expect(res.status).toBe(201);
+    expect(await res.json()).toMatchObject({ guardianName: "Ольга", school: "Лицей 5, 9Б" });
+  });
   it("returns 400 with field errors", async () => {
     const res = await POST(jsonRequest("POST", { name: "", hourlyRateKopecks: -1 }), {});
     expect(res.status).toBe(400);
